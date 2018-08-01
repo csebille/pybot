@@ -26,4 +26,5 @@ def on_connected(data):
 
 
 if __name__ == '__main__':
+
     robot.run()

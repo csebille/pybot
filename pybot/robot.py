@@ -1,6 +1,7 @@
 import traceback
 
 from .adapters import ShellAdapter
+from .adapters import HttpAdapter
 from .events import EventBus
 from .listener import Listener
 from .matchers import RegexMatcher, RobotNameMatcher
@@ -18,6 +19,7 @@ class Robot(object):
         # TODO: dynamically load the adapter based on args
         # TODO: catch all errors and exit if failure to load
         self.adapter = ShellAdapter(self)
+        #self.adapter = HttpAdapter(self)
 
     def run(self):
         self.adapter.run()

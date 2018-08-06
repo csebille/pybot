@@ -50,14 +50,16 @@ class HttpAdapter(Adapter):
         except ValueError:
             user_id = 1
 
-        print('starting server...')
 
         # Server settings
         # Choose port 8080, for port 80, which is normally used for a http server, you need root access
-        server_address = ('127.0.0.1', 8081)
+        port = 8081
+        server_address = ('0.0.0.0', port)
+        print('Starting server...')
         httpd = HTTPServer(server_address, httpAdapter_RequestHandler)
-        httpd.adapter=self
-        print('running server...')
+        # Used to get a reference that can be reached within the RequestHandler
+        httpd.adapter = self
+        print(f'Server listening on port {port}...')
         httpd.serve_forever()
         #httpd.handle_request()
 

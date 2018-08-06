@@ -1,7 +1,6 @@
 import traceback
+import importlib
 
-from .adapters import ShellAdapter
-from .adapters import HttpAdapter
 from .events import EventBus
 from .listener import Listener
 from .matchers import RegexMatcher, RobotNameMatcher
@@ -9,19 +8,26 @@ from .messages import Message
 
 
 class Robot(object):
+
+    adapter = None
+
     def __init__(self, name='Pybot'):
         self.name = name
-        self._load_adapter()
         self._listeners = []
         self._bus = EventBus()
 
-    def _load_adapter(self):
-        # TODO: dynamically load the adapter based on args
-        # TODO: catch all errors and exit if failure to load
-        self.adapter = ShellAdapter(self)
-        #self.adapter = HttpAdapter(self)
+    def load_adapter(self, *adapters_name):
+        requested_adapter_name = 'shell' if len(adapters_name) == 0 else adapters_name[0]
+
+        requested_adapter_module = importlib.import_module('pybot.adapters.'+requested_adapter_name, 'pybot.adapters')
+
+        requested_adapter = getattr(requested_adapter_module, requested_adapter_name.capitalize()+'Adapter')
+        self.adapter = requested_adapter(self)
 
     def run(self):
+        if not self.adapter:
+            self.load_adapter()
+
         self.adapter.run()
 
     def shutdown(self):
@@ -51,7 +57,6 @@ class Robot(object):
                 listener(message)
             except:
                 traceback.print_exc()
-
 
     def respond(self, pattern):
         def wrapper(f):
